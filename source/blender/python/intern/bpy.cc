@@ -708,6 +708,15 @@ static PyObject *bpy_import_test(const char *modname)
   return mod;
 }
 
+#ifdef WITH_PYTHON_MODULE
+static PyObject * bpy_WM_bpy_iteration(PyObject * /*self*/)
+{
+  WM_bpy_iteration();
+  Py_RETURN_NONE;
+}
+static PyMethodDef meth_bpy_WM_bpy_iteration = {"iterate_gui", (PyCFunction)bpy_WM_bpy_iteration, METH_NOARGS, "Do one iteration of Blender GUI" };
+#endif
+
 void BPy_init_modules(bContext *C)
 {
   PyObject *mod;
@@ -793,6 +802,11 @@ void BPy_init_modules(bContext *C)
   /* Register command functions. */
   PYMODULE_ADD_METHOD(mod, &BPY_cli_command_register_def);
   PYMODULE_ADD_METHOD(mod, &BPY_cli_command_unregister_def);
+
+#ifdef WITH_PYTHON_MODULE
+  /* Register bpy WM functions. */
+  PYMODULE_ADD_METHOD(mod, &meth_bpy_WM_bpy_iteration);
+#endif
 
 #undef PYMODULE_ADD_METHOD
 

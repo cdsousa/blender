@@ -646,3 +646,44 @@ void WM_main(bContext *C)
     wm_draw_update(C);
   }
 }
+
+
+#ifdef WITH_PYTHON_MODULE
+
+static bContext *bcontext = nullptr;
+
+void WM_bpy_setup(bContext *C){
+  bcontext = C;
+
+  WM_init_splash_on_startup(C);
+
+  /* Single refresh before handling events.
+  * This ensures we don't run operators before the depsgraph has been evaluated. */
+  wm_event_do_refresh_wm_and_depsgraph(C);
+  
+
+  CTX_wm_window_set(C, static_cast<wmWindow *>(CTX_wm_manager(C)->windows.first));
+}
+
+void WM_bpy_iteration(){
+  if (bcontext) {
+    bContext *C = bcontext;
+    
+    /* Get events from ghost, handle window events, add to window queues. */
+    wm_window_events_process(C);
+
+    /* Per window, all events to the window, screen, area and region handlers. */
+    wm_event_do_handlers(C);
+
+    /* Events have left notes about changes, we handle and cache it. */
+    wm_event_do_notifiers(C);
+
+    /* Execute cached changes draw. */
+    wm_draw_update(C);
+
+    
+    CTX_wm_window_set(C, static_cast<wmWindow *>(CTX_wm_manager(C)->windows.first));
+  }
+}
+
+#endif /* WITH_PYTHON_MODULE */

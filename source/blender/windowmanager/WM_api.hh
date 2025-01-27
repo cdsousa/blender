@@ -144,6 +144,11 @@ void WM_exit(bContext *C, int exit_code) ATTR_NORETURN;
 
 void WM_main(bContext *C) ATTR_NORETURN;
 
+#ifdef WITH_PYTHON_MODULE
+void WM_bpy_setup(bContext *C);
+void WM_bpy_iteration();
+#endif /* WITH_PYTHON_MODULE */
+
 /**
  * Show the splash screen as needed on startup.
  *

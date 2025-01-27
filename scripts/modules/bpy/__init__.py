@@ -69,6 +69,10 @@ def main():
     # until after the key-maps have been initialized.
     utils.load_scripts(extensions=False)
 
+    if not app.background:
+        from _bpy import iterate_gui
+        __import__(__name__).iterate_gui = iterate_gui
+
 
 main()
 

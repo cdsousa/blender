@@ -498,10 +498,20 @@ int main(int argc,
   /* End second initialization. */
 
 #if defined(WITH_PYTHON_MODULE) || defined(WITH_HEADLESS)
-  /* Python module mode ALWAYS runs in background-mode (for now). */
-  G.background = true;
-  /* Manually using `--background` also forces the audio device. */
-  BKE_sound_force_device("None");
+  char *bpy_gui_env = getenv("BLENDER_PYTHON_MODULE_GUI");
+  bool bpy_gui = bpy_gui_env && (
+    !strcmp(bpy_gui_env, "TRUE") ||
+    !strcmp(bpy_gui_env, "True") ||
+    !strcmp(bpy_gui_env, "true") ||
+    !strcmp(bpy_gui_env, "ON")   ||
+    !strcmp(bpy_gui_env, "On")   ||
+    !strcmp(bpy_gui_env, "on")   );
+  if (!bpy_gui){
+    /* Python module mode ALWAYS runs in background-mode (for now). */
+    G.background = true;
+    /* Manually using `--background` also forces the audio device. */
+    BKE_sound_force_device("None");
+  }
 #else
   if (G.background) {
     main_signal_setup_background();
@@ -590,6 +600,10 @@ int main(int argc,
   /* Neither #WM_exit, #WM_main return, this quiets CLANG's `unreachable-code-return` warning. */
   BLI_assert_unreachable();
 
+#else /* WITH_PYTHON_MODULE */
+  if (!G.background) {
+    WM_bpy_setup(C);
+  }
 #endif /* !WITH_PYTHON_MODULE */
 
   return 0;
