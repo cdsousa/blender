@@ -41,3 +41,7 @@ endif()
 # https://github.com/jemalloc/jemalloc/issues/1237
 set(WITH_MEM_JEMALLOC        OFF CACHE BOOL "" FORCE)
 
+
+
+set(WITH_CYCLES_DEVICE_OPTIX    ON  CACHE BOOL "" FORCE)
+set(WITH_CYCLES_CUDA_BINARIES   ON  CACHE BOOL "" FORCE)
